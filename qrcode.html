@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QR Code Scanner</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css">
+    <link rel="shortcut icon" href="qrcode.jpg" type="image/x-icon">
+
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap');
+*{
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: 'Poppins', sans-serif;
+}
+body{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 523px;
+    background-color: #E3F2FD;
+}
+.wrapper{
+    height: 470px;
+width: 420px; 
+ background-color:#0B85FF;
+  padding: 40px 80px 30px;
+  border-radius: 7px;
+  /* height: 63vh; */
+}
+.wrapper form{
+    background-color: #fff;
+    height: 234px;
+    /* width: 223px; */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    border-radius: 7px
+}
+form img{
+    max-width:168px;
+    display: none;
+
+}
+.wrapper.active form img{
+    display: block;
+    height: 30vh;
+}
+.wrapper.active form .content{
+    display: none;
+}
+form .content{
+    /* display: none; */
+}
+.details{
+    position: relative;
+    top:113px;
+    left: -325px;
+}
+.details textarea{
+  width: 20vw;
+    height: 13vh;
+    margin-left: -39px;
+    background-color: #0B85FF;
+    border: 1px solid black;
+    color: white;
+    margin-top:30px;
+    text-align: center;
+padding-top: 15px;
+}
+.details .buttons{
+display: flex;
+justify-content: space-between;
+margin-top: 18px;
+}
+.buttons button{
+    width: 10vw;
+    height: 5vh;
+    background-color: white;
+    color: #0B85FF;
+font-weight: 600;
+outline: none;
+border-radius: 5px;
+    font-size: 28px;
+    margin-left: -40px;
+    height: 6vh;
+    margin-right: 64px;
+cursor: pointer;
+}
+form .content i{
+    color: #0B85FF;
+    font-size: 54px;
+}
+form .content p{
+    color: #0B85FF;
+    font-size: 18px;
+    margin-top: 13px;
+    font-weight: 600;
+}
+
+</style>
+</head>
+<body>
+    <div class="wrapper">
+        <form action="#"> 
+            <input type="file" hidden>
+<img style="width:20vw" src="qrcode.jpg" alt="qrcode">
+<div class="content">
+    <i class="fas fa-cloud-upload"></i>
+    <p id="id1">Upload QR Code to Scan</p>
+</div>
+</form>
+</div>
+
+<div class="details">
+  <textarea disabled id="id2">QR Code Scanner Made in India📍</textarea> 
+  <div class="buttons">
+    <button id="close">Close</button>
+    <button id="copy">Copy Text</button>
+  </div> 
+</div>
+      
+</body>
+<script>
+   const wrapper=document.querySelector('.wrapper'),
+    form=wrapper.querySelector('form');
+    // copybtn=wrapper.querySelector('.copy');
+    let id1=document.getElementById("id1");
+  let copybtn=document.getElementById('copy');
+  let closebtn=document.getElementById('close');
+
+    function fetchfunc(formdata,file){
+        id1.innerText='Scanning the QR Code';
+let id2=document.getElementById('id2');
+        fetch("http://api.qrserver.com/v1/read-qr-code/",{
+         method:"POST",body: formdata  
+          
+        }).then(res=>res.json()).then(result=>{
+            let res=result[0].symbol[0].data;
+        id1.innerText='Upload QR Code to Scan';
+            wrapper.classList.add('active');
+            form.querySelector('img').src=URL.createObjectURL(file); // Here URL.createObjectURL is used to create a URL 
+           id2.innerText=res;
+            console.log(res);
+            console.log(result);
+        });
+    }
+    // Another New Concept
+    // The change event occurs when the value of an element has been changed .
+fileinp=form.querySelector("input");
+fileinp.addEventListener('change',(e)=>{
+let file=e.target.files[0];
+// FormData object will be populated with the form's current keys/values using the name property of each element for the keys and their submitted value for the values
+let formdata=new FormData();
+formdata.append("file",file);
+fetchfunc(formdata,file);
+});
+copybtn.addEventListener("click",funccopy);
+function funccopy()
+{
+ let text=id2.innerHTML;
+  navigator.clipboard.writeText(text);//Copy a Text to the clipboard of a system
+  alert('Copied Successfully');
+};
+form.addEventListener('click',()=>fileinp.click());
+function funcclose(){
+    wrapper.classList.remove('active');
+    id2.innerHTML=" Text ";
+}
+closebtn.addEventListener('click',funcclose);
+
+
+</script>
+</html>
